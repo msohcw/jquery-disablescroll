@@ -1,4 +1,3 @@
-console.log("test")
 /**
  * $.disablescroll
  * Author: Josh Harrison - aloofdesign.com
@@ -17,7 +16,6 @@ console.log("test")
 	var instance;
 
 	var _handleKeydown = function(event) {
-		console.log(this.opts.scrollEventKeys.length)
 		for (var i = 0; i < this.opts.scrollEventKeys.length; i++) {
 			if (event.keyCode === this.opts.scrollEventKeys[i]) {
 				event.preventDefault();
@@ -28,7 +26,7 @@ console.log("test")
 
 	var _handleWheel = function(event) {
 		var dD = this.opts.disabledDirections; //alias
-		if(this.opts.disabledDirections.onlyWebkitSafe === false){
+		if(this.opts.onlyWebkitSafe === false){
 			event.preventDefault();
 			return;
 		}
@@ -38,12 +36,12 @@ console.log("test")
 				if(event.originalEvent.wheelDeltaY > 0 && dD[0]) event.preventDefault(); // up
 				if(event.originalEvent.wheelDeltaY < 0 && dD[1]) event.preventDefault(); // down
 			}
+			
 			if(event.originalEvent.wheelDeltaX){
 				if(event.originalEvent.wheelDeltaX > 0 && dD[2]) event.preventDefault(); // left
 				if(event.originalEvent.wheelDeltaX < 0 && dD[3]) event.preventDefault(); // right
 			}
 		}
-
 	};
 
 	function addIfNotExist(array,item){
@@ -103,7 +101,6 @@ console.log("test")
 					if (dD[3]) addIfNotExist(t.opts.scrollEventKeys,39); //right
 				}
 
-				console.log(t.opts.scrollEventKeys);
 				t.$document.on("keydown.UserScrollDisabler", function(event) {
 					_handleKeydown.call(t, event);
 				});
