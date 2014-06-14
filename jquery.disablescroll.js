@@ -26,7 +26,7 @@ console.log("test")
 	};
 
 	var _handleWheel = function(event) {
-		e.preventDefault();
+		event.preventDefault();
 		// var dD = this.opts.disabledDirections; //alias
 		// if (event.type === "mousewheel"){
 		// 	//webkit
