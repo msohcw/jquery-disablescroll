@@ -17,6 +17,7 @@ console.log("test")
 	var instance;
 
 	var _handleKeydown = function(event) {
+		console.log(this.opts.scrollEventKeys.length)
 		for (var i = 0; i < this.opts.scrollEventKeys.length; i++) {
 			if (event.keyCode === this.opts.scrollEventKeys[i]) {
 				event.preventDefault();
@@ -26,19 +27,23 @@ console.log("test")
 	};
 
 	var _handleWheel = function(event) {
-		event.preventDefault();
-		// var dD = this.opts.disabledDirections; //alias
-		// if (event.type === "mousewheel"){
-		// 	//webkit
-		// 	if(event.originalEvent.wheelDeltaY){
-		// 		if(event.originalEvent.wheelDeltaY > 0 && dD[0]) event.preventDefault(); // up
-		// 		if(event.originalEvent.wheelDeltaY < 0 && dD[1]) event.preventDefault(); // down
-		// 	}
-		// 	if(event.originalEvent.wheelDeltaX){
-		// 		if(event.originalEvent.wheelDeltaX > 0 && dD[2]) event.preventDefault(); // left
-		// 		if(event.originalEvent.wheelDeltaX < 0 && dD[3]) event.preventDefault(); // right
-		// 	}
-		// }
+		var dD = this.opts.disabledDirections; //alias
+		if(this.opts.disabledDirections.onlyWebkitSafe === false){
+			event.preventDefault();
+			return;
+		}
+		if (event.originalEvent.type === "mousewheel"){
+			//webkit
+			if(event.originalEvent.wheelDeltaY){
+				if(event.originalEvent.wheelDeltaY > 0 && dD[0]) event.preventDefault(); // up
+				if(event.originalEvent.wheelDeltaY < 0 && dD[1]) event.preventDefault(); // down
+			}
+			if(event.originalEvent.wheelDeltaX){
+				if(event.originalEvent.wheelDeltaX > 0 && dD[2]) event.preventDefault(); // left
+				if(event.originalEvent.wheelDeltaX < 0 && dD[3]) event.preventDefault(); // right
+			}
+		}
+
 	};
 
 	function addIfNotExist(array,item){
@@ -56,9 +61,11 @@ console.log("test")
 		//disabledDirections up, down, left, right
 
 		this.opts = $.extend({
+			handleWheel : true,
 			handleKeys : true,
-			scrollEventKeys : [32, 33, 34, 35, 36, 37, 38, 39, 40],
-			disabledDirections : [1,1,1,1]
+			scrollEventKeys : [],
+			disabledDirections : [1,1,1,1],
+			onlyWebkitSafe: false
 		}, options);
 		
 		this.$container = $container;
@@ -72,13 +79,13 @@ console.log("test")
 		
 		disable : function() {
 			var t = this;
-
-			t.$container.on("mousewheel.UserScrollDisabler DOMMouseScroll.UserScrollDisabler touchmove.UserScrollDisabler", function(event) {
-				_handleWheel.call(t, event);
-			});
+			if(t.opts.handleWheel){
+				t.$container.on("mousewheel.UserScrollDisabler DOMMouseScroll.UserScrollDisabler touchmove.UserScrollDisabler", function(event) {
+					_handleWheel.call(t, event);
+				});
+			}
 
 			if(t.opts.handleKeys) {
-
 				if(t.opts.disabledDirections) {
 					var dD = t.opts.disabledDirections; //alias
 					if (dD[0]){
@@ -96,6 +103,7 @@ console.log("test")
 					if (dD[3]) addIfNotExist(t.opts.scrollEventKeys,39); //right
 				}
 
+				console.log(t.opts.scrollEventKeys);
 				t.$document.on("keydown.UserScrollDisabler", function(event) {
 					_handleKeydown.call(t, event);
 				});
