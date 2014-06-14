@@ -1,3 +1,4 @@
+console.log("test")
 /**
  * $.disablescroll
  * Author: Josh Harrison - aloofdesign.com
@@ -25,19 +26,39 @@
 	};
 
 	var _handleWheel = function(event) {
-		event.preventDefault();
+		e.preventDefault();
+		// var dD = this.opts.disabledDirections; //alias
+		// if (event.type === "mousewheel"){
+		// 	//webkit
+		// 	if(event.originalEvent.wheelDeltaY){
+		// 		if(event.originalEvent.wheelDeltaY > 0 && dD[0]) event.preventDefault(); // up
+		// 		if(event.originalEvent.wheelDeltaY < 0 && dD[1]) event.preventDefault(); // down
+		// 	}
+		// 	if(event.originalEvent.wheelDeltaX){
+		// 		if(event.originalEvent.wheelDeltaX > 0 && dD[2]) event.preventDefault(); // left
+		// 		if(event.originalEvent.wheelDeltaX < 0 && dD[3]) event.preventDefault(); // right
+		// 	}
+		// }
 	};
 
-	
+	function addIfNotExist(array,item){
+		if($.inArray(array,item) === -1) array.push(item);
+	}
+
+
 	// The object
 
 	function UserScrollDisabler($container, options) {
 
 		// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
 		// left: 37, up: 38, right: 39, down: 40
+
+		//disabledDirections up, down, left, right
+
 		this.opts = $.extend({
 			handleKeys : true,
-			scrollEventKeys : [32, 33, 34, 35, 36, 37, 38, 39, 40]
+			scrollEventKeys : [32, 33, 34, 35, 36, 37, 38, 39, 40],
+			disabledDirections : [1,1,1,1]
 		}, options);
 		
 		this.$container = $container;
@@ -46,13 +67,35 @@
 		this.disable();
 
 	}
+
 	UserScrollDisabler.prototype = {
 		
 		disable : function() {
 			var t = this;
-			t.$container.on("mousewheel.UserScrollDisabler DOMMouseScroll.UserScrollDisabler touchmove.UserScrollDisabler", _handleWheel);
+
+			t.$container.on("mousewheel.UserScrollDisabler DOMMouseScroll.UserScrollDisabler touchmove.UserScrollDisabler", function(event) {
+				_handleWheel.call(t, event);
+			});
 
 			if(t.opts.handleKeys) {
+
+				if(t.opts.disabledDirections) {
+					var dD = t.opts.disabledDirections; //alias
+					if (dD[0]){
+						addIfNotExist(t.opts.scrollEventKeys,33); //pageup
+						addIfNotExist(t.opts.scrollEventKeys,36); //home
+						addIfNotExist(t.opts.scrollEventKeys,38); //pageup
+					}
+					if (dD[1]){
+						addIfNotExist(t.opts.scrollEventKeys,32); //spacebar
+						addIfNotExist(t.opts.scrollEventKeys,34); //pagedown
+						addIfNotExist(t.opts.scrollEventKeys,35); //end
+						addIfNotExist(t.opts.scrollEventKeys,40); //down
+					}
+					if (dD[2]) addIfNotExist(t.opts.scrollEventKeys,37); //left
+					if (dD[3]) addIfNotExist(t.opts.scrollEventKeys,39); //right
+				}
+
 				t.$document.on("keydown.UserScrollDisabler", function(event) {
 					_handleKeydown.call(t, event);
 				});
